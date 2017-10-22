@@ -45,39 +45,39 @@ while epoch < epochmax
     end
     
     H = [];
-    Mu = zeros(total_examples, class, total_features); % Mu: miu all samples (jml data x jml class x jml features)
-    for i = 1:total_examples %looping setiap samples untuk forward pass
+    Mu = zeros(total_examples, class, total_features); % Mu: miu all samples (total samples x total classes x total features)
+    for i = 1:total_examples % looping for each samples for forward pass
         for k = 1:class
-            w1(k) = 1;%ini buat w (bukan w bar)
+            w1(k) = 1; % w (not w bar)
             for j = 1:total_features
-                mu(k,j) = 1/(1 + ((input_data(i,j)-c(k,j))/a(k,j))^(2*b(k,j))); %mu: miu one sample
-                w1(k) = w1(k)*mu(k,j); % isi w kelas ke k
+                mu(k,j) = 1/(1 + ((input_data(i,j)-c(k,j))/a(k,j))^(2*b(k,j))); % mu: miu of one sample
+                w1(k) = w1(k)*mu(k,j); % fill w for k-th class
                 Mu(i, k, j) = mu(k, j);
             end;
         end;
-        w = w1/sum(w1); % w = w bar satu baris / satu sample data
+        w = w1/sum(w1); % w = w bar one row / one sample data
         XX = [];
         for k = 1:class
             XX = [XX w(k)*input_data(i,:) w(k)];
-        end; % pada akhirnya si XX udah jadi matrix H untuk satu sample di looping itu
-        H = [H; XX]; %yg ini gabungin matrix H setiap sample
+        end; % in the end, XX is H matrix for one sample in coresponding iteration
+        H = [H; XX]; % combine matrix H of each sample
     end
 
     % consequent parameter (p, q, r)
     beta = pinv(H) * output_data; % moore pseudo invers
 
-    output = H * beta; % hitung outputnya dari weight yang udah didapet
+    output = H * beta; % calculate output from weight
 
-    E = sum((output_data - output).^2)/total_examples; % hitung error
+    E = sum((output_data - output).^2)/total_examples; % calculate error
 
-    if E < minimal_error % update yang terbaik
+    if E < minimal_error % update min error
         minimal_error = E;
         best_a = a;
         best_b = b;
         best_c = c;
     end
 
-    Et(epoch) = minimal_error; %tampung minimal error ke Et
+    Et(epoch) = minimal_error;
     
     % Draw the SSE plot.....
 %     plot(1:epoch, Et);
